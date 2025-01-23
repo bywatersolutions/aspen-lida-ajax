@@ -211,7 +211,15 @@ export const Variations = (props) => {
                                                                  </SelectDragIndicatorWrapper>
                                                                  <SelectScrollView>
                                                                       {_.map(holdSelectItemResponse.items, function (item, index, array) {
-                                                                           return <SelectItem label={item.callNumber} value={item.itemNumber} key={index} />;
+                                                                           let itemLabel = "";
+                                                                           if (item.location) {
+                                                                                itemLabel = item.location + " - ";
+                                                                           }
+                                                                           itemLabel += item.callNumber;
+                                                                           if (item.status) {
+                                                                                itemLabel += " - " + item.status;
+                                                                           }
+                                                                           return <SelectItem label={itemLabel} value={item.itemNumber} key={index} />;
                                                                       })}
                                                                  </SelectScrollView>
                                                             </SelectContent>

@@ -58,6 +58,24 @@ export function getCleanTitle(title) {
      return 'Unknown';
 }
 
+export const getCallNumber = (callNumber) => {
+     const { language } = React.useContext(LanguageContext);
+     if (callNumber) {
+          return (
+               <Text
+                    maxW="100%"
+                    flexWrap="wrap"
+                    fontSize={{
+                         base: 'xs',
+                         lg: 'sm',
+                    }}>
+                    <Text bold>{getTermFromDictionary(language, 'call_number')}:</Text> {callNumber}
+               </Text>
+          );
+     }
+     return null;
+}
+
 export const getVolume = (volume) => {
      const { language } = React.useContext(LanguageContext);
      if (volume) {

@@ -245,6 +245,14 @@ export const Editions = () => {
                                                                  </SelectDragIndicatorWrapper>
                                                                  <SelectScrollView>
                                                                       {_.map(holdSelectItemResponse.items, function (item, index, array) {
+                                                                           let itemLabel = "";
+                                                                           if (item.location) {
+                                                                                itemLabel = item.location + " - ";
+                                                                           }
+                                                                           itemLabel += item.callNumber;
+                                                                           if (item.status) {
+                                                                                itemLabel += " - " + item.status;
+                                                                           }
                                                                            return <SelectItem label={item.callNumber} value={item.itemNumber} key={index} />;
                                                                       })}
                                                                  </SelectScrollView>
