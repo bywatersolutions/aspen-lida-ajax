@@ -318,6 +318,7 @@ export async function getPatronHolds(readySort = 'expire', pendingSort = 'sortTi
  * @param {string} language
  **/
 export async function getPatronCheckedOutItems(source = 'all', url, refresh = true, language = 'en') {
+     console.log("Loading checked out items for source " + source);
      const postBody = await postData();
      const discovery = create({
           baseURL: url + '/API',
@@ -333,10 +334,17 @@ export async function getPatronCheckedOutItems(source = 'all', url, refresh = tr
      });
      const response = await discovery.post('/UserAPI?method=getPatronCheckedOutItems', postBody);
      if (response.ok) {
-          let items = response.data?.result?.checkedOutItems ?? [];
-          items = _.sortBy(items, ['daysUntilDue', 'title']);
-          return items;
+          if (response.data?.result?.success) {
+               //console.log("Loaded checkouts successfully");
+               let items = response.data.result.checkedOutItems ?? [];
+               //console.log("Found " + items.length + " checkouts");
+               items = _.sortBy(items, ['daysUntilDue', 'title']);
+               return items;
+          }else{
+               return [];
+          }
      } else {
+          console.log("Loading checkouts failed");
           console.log(response);
           return [];
      }

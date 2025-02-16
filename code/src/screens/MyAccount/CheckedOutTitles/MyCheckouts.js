@@ -15,7 +15,6 @@ import { confirmRenewAllCheckouts, confirmRenewCheckout, renewAllCheckouts } fro
 import { getPatronCheckedOutItems } from '../../../util/api/user';
 import { stripHTML } from '../../../util/apiAuth';
 import { MyCheckout } from './MyCheckout';
-import { ManageSelectedHolds } from '../TitlesOnHold/MyHold';
 
 export const MyCheckouts = () => {
      const isFetchingCheckouts = useIsFetching({ queryKey: ['checkouts'] });
@@ -25,9 +24,9 @@ export const MyCheckouts = () => {
      const { library } = React.useContext(LibrarySystemContext);
      const { checkouts, updateCheckouts, sortMethod, updateSortMethod } = React.useContext(CheckoutsContext);
      const { language } = React.useContext(LanguageContext);
+     const [checkoutSource, setCheckoutSource] = React.useState('all');
      const [isLoading, setLoading] = React.useState(false);
      const [renewAll, setRenewAll] = React.useState(false);
-     const [source, setSource] = React.useState('all');
      const { systemMessages, updateSystemMessages } = React.useContext(SystemMessagesContext);
      const [filterByLibby, setFilterByLibby] = React.useState(false);
 
@@ -64,7 +63,7 @@ export const MyCheckouts = () => {
           });
      }, [navigation]);
 
-     useQuery(['checkouts', user.id, library.baseUrl, language, source], () => getPatronCheckedOutItems(source, library.baseUrl, true, language), {
+     useQuery(['checkouts', user.id, library.baseUrl, language], () => getPatronCheckedOutItems('all', library.baseUrl, true, language), {
           placeholderData: checkouts,
           onSuccess: (data) => {
                updateCheckouts(data);
@@ -75,18 +74,15 @@ export const MyCheckouts = () => {
      const toggleSort = async (value) => {
           updateSortMethod(value);
           const sortedCheckouts = sortCheckouts(checkouts, value);
-          setLoading(true);
-          queryClient.setQueryData(['checkouts', library.baseUrl, language, sortMethod, source], sortedCheckouts);
-          setLoading(false);
           updateCheckouts(sortedCheckouts);
      };
 
-     const toggleSource = async (value) => {
-          console.log('toggleSource: ' + value);
-          setSource(value);
-          setLoading(true);
+     const toggleCheckoutSource = async (value) => {
+          const originalCheckoutSource = checkoutSource;
+          setCheckoutSource(value);
+          //setLoading(true);
+          //console.log('changing checkouts from ' + originalCheckoutSource + ' to ' + value);
           if (!_.isNull(value)) {
-               console.log('source: ' + source);
                if (value === 'ils') {
                     navigation.setOptions({ title: checkoutsBy.ils });
                } else if (value === 'overdrive') {
@@ -102,10 +98,14 @@ export const MyCheckouts = () => {
                } else {
                     navigation.setOptions({ title: checkoutsBy.all });
                }
-               await queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, source] });
-               await queryClient.refetchQueries({ queryKey: ['checkouts', user.id, library.baseUrl, value] });
+               //console.log("Clearing previous checkouts queries for " + originalCheckoutSource);
+               //await queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, originalCheckoutSource] });
+               //console.log("Re-fetching checkout queries for " + value);
+               //await queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, value] });
+               //await queryClient.refetchQueries({ queryKey: ['checkouts', user.id, library.baseUrl, value] });
+
           }
-          setLoading(false);
+          //setLoading(false);
      };
 
      useFocusEffect(
@@ -245,29 +245,32 @@ export const MyCheckouts = () => {
      const reloadCheckouts = async () => {
           setLoading(true);
           queryClient.invalidateQueries({ queryKey: ['user', library.baseUrl, language] });
-          queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, language, source] });
+          queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, language, 'all'] });
           setLoading(false);
      };
 
+     const filterCheckouts = (source) => {
+     }
+
      const actionButtons = () => {
-          let holdSource = getTermFromDictionary(language, 'filter_by_all') + ' (' + (user.numCheckedOut ?? 0) + ')';
-          if (source === 'all') {
-               holdSource = getTermFromDictionary(language, 'filter_by_all') + ' (' + (user.numCheckedOut ?? 0) + ')';
-          } else if (source === 'ils') {
-               holdSource = getTermFromDictionary(language, 'filter_by_ils') + ' (' + (user.numCheckedOutIls ?? 0) + ')';
-          } else if (source === 'overdrive') {
-               holdSource = filterByLibby + ' (' + (user.numCheckedOutOverDrive ?? 0) + ')';
-          } else if (source === 'hoopla') {
-               holdSource = getTermFromDictionary(language, 'filter_by_hoopla') + ' (' + (user.numCheckedOut_Hoopla ?? 0) + ')';
-          } else if (source === 'cloud_library') {
-               holdSource = getTermFromDictionary(language, 'filter_by_cloud_library') + ' (' + (user.numCheckedOut_cloudLibrary ?? 0) + ')';
-          } else if (source === 'axis360') {
-               holdSource = getTermFromDictionary(language, 'filter_by_boundless') + ' (' + (user.numCheckedOut_axis360 ?? 0) + ')';
-          } else if (source === 'palace_project') {
-               holdSource = getTermFromDictionary(language, 'filter_by_palace_project') + ' (' + (user.numCheckedOut_PalaceProject ?? 0) + ')';
+          let checkoutSourceLabel = getTermFromDictionary(language, 'filter_by_all') + ' (' + (user.numCheckedOut ?? 0) + ')';
+          if (checkoutSource === 'all') {
+               checkoutSourceLabel = getTermFromDictionary(language, 'filter_by_all') + ' (' + (user.numCheckedOut ?? 0) + ')';
+          } else if (checkoutSource === 'ils') {
+               checkoutSourceLabel = getTermFromDictionary(language, 'filter_by_ils') + ' (' + (user.numCheckedOutIls ?? 0) + ')';
+          } else if (checkoutSource === 'overdrive') {
+               checkoutSourceLabel = filterByLibby + ' (' + (user.numCheckedOutOverDrive ?? 0) + ')';
+          } else if (checkoutSource === 'hoopla') {
+               checkoutSourceLabel = getTermFromDictionary(language, 'filter_by_hoopla') + ' (' + (user.numCheckedOut_Hoopla ?? 0) + ')';
+          } else if (checkoutSource === 'cloud_library') {
+               checkoutSourceLabel = getTermFromDictionary(language, 'filter_by_cloud_library') + ' (' + (user.numCheckedOut_cloudLibrary ?? 0) + ')';
+          } else if (checkoutSource === 'axis360') {
+               checkoutSourceLabel = getTermFromDictionary(language, 'filter_by_boundless') + ' (' + (user.numCheckedOut_axis360 ?? 0) + ')';
+          } else if (checkoutSource === 'palace_project') {
+               checkoutSourceLabel = getTermFromDictionary(language, 'filter_by_palace_project') + ' (' + (user.numCheckedOut_PalaceProject ?? 0) + ')';
           }
 
-          let holdSourceLength = 8 * holdSource.length + 80;
+          let checkoutsSourceLabelLength = 8 * checkoutSourceLabel.length + 80;
 
           let sortLength = 8 * sortBy.title.length + 80;
           if (sortMethod === 'author') {
@@ -333,21 +336,21 @@ export const MyCheckouts = () => {
                                    }}>
                                    {getTermFromDictionary(language, 'checkouts_reload')}
                               </Button>
-                              <FormControl w={holdSourceLength}>
+                              <FormControl w={checkoutsSourceLabelLength}>
                                    <Select
                                         isReadOnly={Platform.OS === 'android'}
-                                        name="holdSource"
+                                        name="checkoutSource"
                                         _dark={{
                                              borderWidth: '1',
                                              borderColor: 'gray.400',
                                         }}
-                                        selectedValue={source}
+                                        selectedValue={checkoutSource}
                                         accessibilityLabel={getTermFromDictionary(language, 'filter_by_source_label')}
                                         _selectedItem={{
                                              bg: 'tertiary.300',
                                              endIcon: <CheckIcon size="5" />,
                                         }}
-                                        onValueChange={(itemValue) => toggleSource(itemValue)}>
+                                        onValueChange={(itemValue) => toggleCheckoutSource(itemValue)}>
                                         <Select.Item label={getTermFromDictionary(language, 'filter_by_all') + ' (' + (user.numCheckedOut ?? 0) + ')'} value="all" key={0} />
                                         <Select.Item label={getTermFromDictionary(language, 'filter_by_ils') + ' (' + (user.numCheckedOutIls ?? 0) + ')'} value="ils" key={1} />
                                         {user.isValidForOverdrive ? <Select.Item label={filterByLibby + ' (' + (user.numCheckedOutOverDrive ?? 0) + ')'} value="overdrive" key={2} /> : null}
@@ -431,7 +434,7 @@ export const MyCheckouts = () => {
                               <AlertDialog.Body>{renewConfirmationResponse?.message ? decodeMessage(renewConfirmationResponse.message) : 'Unable to renew checkout for unknown error. Please contact the library.'}</AlertDialog.Body>
                               <AlertDialog.Footer>
                                    <Button.Group space={3}>
-                                        <Button variant="outline" colorScheme="primary" onPress={() => setHoldConfirmationIsOpen(false)}>
+                                        <Button variant="outline" colorScheme="primary" onPress={() => setRenewConfirmationIsOpen(false)}>
                                              {getTermFromDictionary(language, 'close_window')}
                                         </Button>
                                         <Button
@@ -443,7 +446,7 @@ export const MyCheckouts = () => {
                                                   if (renewConfirmationResponse.renewType === 'all') {
                                                        await confirmRenewAllCheckouts(library.baseUrl, language).then(async (result) => {
                                                             queryClient.invalidateQueries({ queryKey: ['user', library.baseUrl, language] });
-                                                            queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, language, source] });
+                                                            queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, language, 'all'] });
 
                                                             setRenewConfirmationIsOpen(false);
                                                             setConfirmingRenewal(false);
@@ -451,7 +454,7 @@ export const MyCheckouts = () => {
                                                   } else {
                                                        await confirmRenewCheckout(renewConfirmationResponse.barcode, renewConfirmationResponse.recordId, renewConfirmationResponse.source, renewConfirmationResponse.itemId, library.baseUrl, renewConfirmationResponse.userId).then(async (result) => {
                                                             queryClient.invalidateQueries({ queryKey: ['user', library.baseUrl, language] });
-                                                            queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, language, source] });
+                                                            queryClient.invalidateQueries({ queryKey: ['checkouts', user.id, library.baseUrl, language, 'all'] });
 
                                                             setRenewConfirmationIsOpen(false);
                                                             setConfirmingRenewal(false);
@@ -465,13 +468,16 @@ export const MyCheckouts = () => {
                          </AlertDialog.Content>
                     </AlertDialog>
                </Center>
-               <FlatList data={checkouts} ListEmptyComponent={noCheckouts} renderItem={({ item }) => <MyCheckout data={item} reloadCheckouts={reloadCheckouts} />} keyExtractor={(item, index) => index.toString()} contentContainerStyle={{ paddingBottom: 30 }} setRenewConfirmationIsOpen={setRenewConfirmationIsOpen} setRenewConfirmationResponse={setRenewConfirmationResponse} />
+               <FlatList data={checkouts} ListEmptyComponent={noCheckouts}
+                    renderItem={({ item }) => <MyCheckout data={item} reloadCheckouts={reloadCheckouts} checkoutSource={checkoutSource} />}
+                    keyExtractor={(item, index) => index.toString()} contentContainerStyle={{ paddingBottom: 30 }} setRenewConfirmationIsOpen={setRenewConfirmationIsOpen} setRenewConfirmationResponse={setRenewConfirmationResponse} />
           </SafeAreaView>
      );
 };
 
 function sortCheckouts(checkouts, sort) {
      let sortedCheckouts = [];
+     console.log("Sorting checkouts by " + sort);
 
      let sortMethod = sort;
      let order = 'asc';

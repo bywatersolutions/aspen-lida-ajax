@@ -158,7 +158,7 @@ export const DrawerContent = () => {
      useQuery(['checkouts', user.id, library.baseUrl, language], () => getPatronCheckedOutItems('all', library.baseUrl, false, language), {
           refetchInterval: 60 * 1000 * 15,
           refetchIntervalInBackground: true,
-		 refetchOnWindowFocus: 'always',
+          refetchOnWindowFocus: 'always',
           onSuccess: (data) => updateCheckouts(data),
           placeholderData: [],
      });
