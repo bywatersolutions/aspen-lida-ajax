@@ -22,7 +22,6 @@ const HeaderLogoBar = (props) => {
           const ratio = width/1536;
           const imageHeight = 200 * ratio;
           const colorMode = useColorMode();
-          console.log("Color mode is " + colorMode);
           let backgroundColor = '#000000';
           if (colorMode == 'light') {
                backgroundColor = '#FFFFFF';
