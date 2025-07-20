@@ -1,17 +1,29 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { create } from 'apisauce';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import {includes, isUndefined} from 'lodash';
-import { Button, Center, FormControl, Icon, Input, Pressable } from 'native-base';
+import {
+     Button,
+     ButtonText,
+     Center,
+     FormControl,
+     FormControlLabel,
+     FormControlLabelText,
+     Icon,
+     Input,
+     InputField, InputIcon,
+     InputSlot,
+     Pressable,
+} from '@gluestack-ui/themed';
 import React, { useRef } from 'react';
 
 // custom components and helper files
 import { AuthContext } from '../../components/navigation';
 import { DisplayMessage } from '../../components/Notifications';
-import { LanguageContext, LibrarySystemContext } from '../../context/initialContext';
+import { LanguageContext, LibrarySystemContext, ThemeContext } from '../../context/initialContext';
 import { navigate } from '../../helpers/RootNavigator';
 import { getTermFromDictionary } from '../../translations/TranslationService';
 import { getCatalogStatus } from '../../util/api/library';
@@ -26,6 +38,7 @@ import { ResetExpiredPin } from './ResetExpiredPin';
 import { logDebugMessage, logInfoMessage, logWarnMessage } from '../../util/logging.js';
 
 export const GetLoginForm = (props) => {
+     const {theme, textColor, colorMode} = React.useContext(ThemeContext);
      const navigation = useNavigation();
      const barcode = useRoute().params?.barcode ?? null;
      const [loading, setLoading] = React.useState(false);
@@ -199,74 +212,67 @@ export const GetLoginForm = (props) => {
           <>
                {loginError ? <DisplayMessage type="error" message={loginErrorMessage} /> : null}
                <FormControl>
-                    <FormControl.Label
-                         _text={{
-                              fontSize: 'sm',
-                              fontWeight: 600,
-                         }}>
-                         {usernameLabel}
-                    </FormControl.Label>
-                    <Input
-                         autoCapitalize="none"
-                         size="xl"
-                         autoCorrect={false}
-                         variant="filled"
-                         id="barcode"
-                         value={valueUser}
-                         onChangeText={(text) => setUsername(text)}
-                         returnKeyType="next"
-                         textContentType="username"
-                         required
-                         onSubmitEditing={() => {
-                              passwordRef.current.focus();
-                         }}
-                         blurOnSubmit={false}
-                         InputRightElement={
-                              allowBarcodeScanner ? (
-                                   <Pressable onPress={() => openScanner()}>
-                                        <Icon as={<Ionicons name="barcode-outline" />} size={6} mr="2" />
-                                   </Pressable>
-                              ) : null
-                         }
-                    />
+                    <FormControlLabel>
+                         <FormControlLabelText fontSize="sm" color={textColor}>{usernameLabel}</FormControlLabelText>
+                    </FormControlLabel>
+                    <Input>
+                         <InputField autoCapitalize="none"
+                                       size="xl"
+                                       autoCorrect={false}
+                                       variant="filled"
+                                       id="barcode"
+                                       value={valueUser}
+                                       onChangeText={(text) => setUsername(text)}
+                                       returnKeyType="next"
+                                       textContentType="username"
+                                       required
+                                       onSubmitEditing={() => {
+                                            passwordRef.current.focus();
+                                       }}
+                                       blurOnSubmit={false}
+                         />
+                         {allowBarcodeScanner ?
+                              <InputSlot onPress={() => openScanner()}>
+                              <InputIcon as={Ionicons} name="barcode-outline" mr="$2" color={textColor} />
+                         </InputSlot> : null}
+                    </Input>
                </FormControl>
-               <FormControl mt={3}>
-                    <FormControl.Label
-                         _text={{
-                              fontSize: 'sm',
-                              fontWeight: 600,
-                         }}>
-                         {passwordLabel}
-                    </FormControl.Label>
-                    <Input
-                         variant="filled"
-                         size="xl"
-                         type={showPassword ? 'text' : 'password'}
-                         returnKeyType="go"
-                         textContentType="password"
-                         ref={passwordRef}
-                         InputRightElement={<Icon as={<Ionicons name={showPassword ? 'eye-outline' : 'eye-off-outline'} />} size="md" ml={1} mr={3} onPress={toggleShowPassword} roundedLeft={0} roundedRight="md" />}
-                         onChangeText={(text) => setPassword(text)}
-                         onSubmitEditing={async () => {
-                              setLoading(true);
-                              await initialValidation();
-                         }}
-                         required
-                    />
+               <FormControl mt="$3">
+                    <FormControlLabel>
+                         <FormControlLabelText size="sm" color={textColor}>{passwordLabel}</FormControlLabelText>
+                    </FormControlLabel>
+                    <Input>
+                         <InputField variant="filled"
+                                     size="xl"
+                                     type={showPassword ? 'text' : 'password'}
+                                     returnKeyType="go"
+                                     textContentType="password"
+                                     ref={passwordRef}
+                                     onChangeText={(text) => setPassword(text)}
+                                     onSubmitEditing={async () => {
+                                          setLoading(true);
+                                          await initialValidation();
+                                     }}
+                                     required
+                         />
+                         <InputSlot onPress={toggleShowPassword}>
+                              <InputIcon as={Ionicons} name={showPassword ? 'eye-outline' : 'eye-off-outline'} mr="$2" color={textColor} />
+                         </InputSlot>
+                    </Input>
                </FormControl>
 
                <Center>
                     <Button
-                         mt={3}
+                         mt="$3"
                          size="md"
-                         color="#30373b"
+                         bgColor={theme['colors']['primary']['500']}
                          isLoading={loading}
                          isLoadingText={getTermFromDictionary('en', 'logging_in', true)}
                          onPress={async () => {
                               setLoading(true);
                               await initialValidation();
                          }}>
-                         {getTermFromDictionary('en', 'login')}
+                         <ButtonText color={theme['colors']['primary']['500-text']}>{getTermFromDictionary('en', 'login')}</ButtonText>
                     </Button>
                </Center>
           </>
