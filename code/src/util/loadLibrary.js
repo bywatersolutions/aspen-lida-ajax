@@ -132,13 +132,13 @@ export async function getPickupSublocations(url = null) {
                PATRON.sublocations = sublocations;
                return sublocations;
           }else{
-               logErrorMessage("Call to get sublocations did not succeed");
+               logDebugMessage("Call to get sublocations did not succeed");
                logErrorMessage(response);
           }
      } else {
           const error = getErrorMessage({ statusCode: response.status, problem: response.problem, sendToSentry: true });
           popToast(error.title, error.message, 'error');
-          logErrorMessage(response);
+          logDebugMessage(response);
      }
 
      PATRON.sublocations = sublocations;
@@ -161,7 +161,7 @@ export async function getVdxForm(url, id) {
      } else {
           const error = getErrorMessage({ statusCode: response.status, problem: response.problem, sendToSentry: true });
           popToast(error.title, error.message, 'error');
-          logErrorMessage(response);
+          logDebugMessage(response);
      }
 }
 
@@ -181,7 +181,7 @@ export async function getLocalIllForm(url, id) {
      } else {
           const error = getErrorMessage({ statusCode: response.status, problem: response.problem, sendToSentry: true });
           popToast(error.title, error.message, 'error');
-          logErrorMessage(response);
+          logDebugMessage(response);
      }
 }
 
