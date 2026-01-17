@@ -178,7 +178,7 @@ const EditList = (props) => {
                                              {listGroupId != -1 ? (
                                                        _.map(Object.values(listGroups.groups), function (group, selectedIndex, array) {
                                                             if (group.id === listGroupId) {
-                                                                 return <SelectInput placeholder={group.title} value={group.id} color={textColor} />;
+                                                                 return <SelectInput value={group.title} color={textColor} />;
                                                             }
                                                        })
                                                   ) :
@@ -195,7 +195,7 @@ const EditList = (props) => {
                                                   <SelectDragIndicatorWrapper>
                                                        <SelectDragIndicator />
                                                   </SelectDragIndicatorWrapper>
-                                                  <SelectItem label={getTermFromDictionary(language, 'no_list_group')} value="-1" key={-1} sx={{ _text: { color: textColor } }} bgColor={listGroupId == -1 ? theme['colors']['tertiary']['300'] : ''} sx={{ _text: { color: listGroupId == -1 ? theme['colors']['tertiary']['500-text'] : textColor } }} />
+                                                  <SelectItem label={getTermFromDictionary(language, 'no_list_group')} value="-1" key={-1} sx={{ _text: { color: listGroupId == -1 ? theme['colors']['tertiary']['500-text'] : textColor } }} />
                                                   {_.map(listGroups.groups, function (item, index, array) {
                                                        return <SelectItem key={index} value={item.id} label={item.title} bgColor={listGroupId === item.id ? theme['colors']['tertiary']['300'] : ''} sx={{ _text: { color: listGroupId === item.id ? theme['colors']['tertiary']['500-text'] : textColor } }} />;
                                                   })}
