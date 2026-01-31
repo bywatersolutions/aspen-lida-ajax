@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Dimensions } from 'react-native';
 
-import { ThemeContext } from '../../context/initialContext';
+import { LibrarySystemContext, ThemeContext } from '../../context/initialContext';
 import { Image } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 import { logErrorMessage } from '../../util/logging';
@@ -43,8 +43,9 @@ const HomeScreenLinkGrid = ({links}) => {
 }
 
 const Link = ({link}) => {
-     const navigation = useNavigation();
      const { theme, textColor, colorMode } = React.useContext(ThemeContext);
+     const { library } = React.useContext(LibrarySystemContext);
+     const navigation = useNavigation();
 
      const handleOpenLink = () => {
           // Open external link in web browser based on link.linkUrl
@@ -129,12 +130,14 @@ const Link = ({link}) => {
           }
      }
 
+     const imgSource = link?.typeOfIcon === 'uploadIcon' && link?.uploadIcon ? library.baseUrl + '/files/original/' + link.uploadIcon : null;
+
      return (
           <Pressable onPress={(link?.linkType !== 'deepLink') ? handleOpenLink : handleOpenScreen} alignItems="center" justifyContent="center" padding="$2" width="100%" borderRadius="$lg" backgroundColor={colorMode === 'light' ? theme['colors']['coolGray']['200'] : theme['colors']['coolGray']['700']}>
                <VStack alignItems="center" justifyContent="center" minHeight={100}>
-                    {link?.typeOfIcon === 'imageUpload' && link?.uploadIcon ? (
+                    {link?.typeOfIcon === 'uploadIcon' && imgSource ? (
                          <Image
-                              source={{ uri: link?.uploadIcon }}
+                              source={{ uri: imgSource }}
                               style={{ width: 52, height: 52, marginBottom: 8 }}
                               contentFit="contain"
                          />
