@@ -3,6 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
+import * as WebBrowser from 'expo-web-browser';
 import _ from 'lodash';
 import { Box, Button, ButtonGroup, ButtonText, ButtonIcon, Center, Image, Text, KeyboardAvoidingView } from '@gluestack-ui/themed';
 import React from 'react';
@@ -53,6 +54,7 @@ export const LoginScreen = () => {
      const [ils, setIls] = React.useState('koha');
      const [enableSelfRegistration, setEnableSelfRegistration] = React.useState(false);
      const [selfRegistrationFields, setSelfRegistrationFields] = React.useState([]);
+     const [selfRegistrationURL, setSelfRegistrationURL] = React.useState("");
      const { updateLibrary } = React.useContext(LibrarySystemContext);
      const { theme, colorMode, textColor, updateTheme, updateColorMode } = React.useContext(ThemeContext);
      const insets = useSafeAreaInsets();
@@ -166,7 +168,7 @@ export const LoginScreen = () => {
                     }
 
                     if (library.catalogRegistrationCapabilities) {
-                              if(String(library.catalogRegistrationCapabilities.enableSelfRegistration) === '1' && String(library.catalogRegistrationCapabilities.enableSelfRegistrationInApp === '1')) {
+                              if(String(library.catalogRegistrationCapabilities.enableSelfRegistration) === '1' && String(library.catalogRegistrationCapabilities.enableSelfRegistrationInApp) === '1') {
                                    setEnableSelfRegistration(1);
                               } else {
                                    setEnableSelfRegistration(0);
@@ -178,7 +180,14 @@ export const LoginScreen = () => {
      };
 
      const openSelfRegistration = () => {
-          navigate('SelfRegistration', { libraryUrl: LIBRARY.url });
+          if(selfRegistrationURL)
+          {
+               WebBrowser.openBrowserAsync(selfRegistrationURL);
+          }
+          else
+          {
+               navigate('SelfRegistration', { libraryUrl: LIBRARY.url });
+          }
      };
 
      if (isLoading) {
