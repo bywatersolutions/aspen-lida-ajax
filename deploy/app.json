@@ -1,0 +1,15 @@
+{
+  "name": "Ajax Public Library",
+  "slug": "APL",
+  "easId": "3a435ac2-86df-48bf-b7b4-aed104d8942a",
+  "reverseDns": "ca.ajaxlibrary.aplApp",
+  "discoveryUrl": "https://discover.ajaxlibrary.ca/",
+  "greenhouseUrl": "https://discover.ajaxlibrary.ca/",
+  "libraryId": "2",
+  "themeId": "1",
+  "background": "#ffffff",
+  "sentryProject": "aspen-lida-ajax",
+  "sentryDsn": "https://d962342dfc5e4e6684271688c7522988@o994439.ingest.sentry.io/4504759358128128",
+  "ascAppId": "1514620463",
+  "logLevel": "0"
+}
