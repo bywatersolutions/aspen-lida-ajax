@@ -59,6 +59,7 @@ module.exports = () => {
     const googleApiKeyApple = process.env.GOOGLE_API_KEY_APPLE;
     const googleApiKeyAndroid = process.env.GOOGLE_API_KEY_ANDROID;
     const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
+    const extraHeaders = process.env.EXTRA_HEADERS;
 
     let config = {
          name: app['name'],
@@ -162,6 +163,7 @@ module.exports = () => {
               patch: version['patch'],
               stage: version['stage'],
               logLevel: app['logLevel'],
+              headers: extraHeaders
          },
          plugins: [
               'expo-secure-store',
